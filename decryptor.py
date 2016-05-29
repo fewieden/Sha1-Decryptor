@@ -1,13 +1,19 @@
 from itertools import *
-import os, threading, queue, hashlib
+import os
+import threading
+import queue
+import hashlib
+import string
+import sys
+import getopt
 
 
 class Decryptor:
-    UPPERCASE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-    LOWERCASE = 'abcdefghijklmnopqrstuvwxyz'
-    SPACE = ' '
-    NUMBERS = '0123456789'
-    SPECIALCHARS = '!.:_-,;#?$§&"^°%/()=`*+~<>|²³{[]}\'\\'
+    UPPERCASE = string.ascii_uppercase
+    LOWERCASE = string.ascii_lowercase
+    SPACE = string.whitespace
+    NUMBERS = string.digits
+    SPECIALCHARS = string.punctuation
 
     def __init__(self, hashcode, options):
         self.hashcode = hashcode
@@ -59,3 +65,66 @@ class Decryptor:
             if password_hash == self.hashcode:
                 self.flag = False
                 print(password + ' : ' + password_hash)
+
+
+def print_help():
+    print("\ncommand line arguments:\n" +
+          "--help: shows all possible options\n" +
+          "-m/--max NUMBER: max length of password\n" +
+          "-u/--uppercase: enables uppercase letters\n" +
+          "-l/--lowercase: enables lowercase letters\n" +
+          "-w/--whitespace: enables whitespace\n" +
+          "-n/--lowercase: enables numbers\n" +
+          "-s/--specialchars: enables special characters\n")
+
+
+def main(argv):
+    try:
+        opts, args = getopt.getopt(argv, "m:ulwnsh:",
+                                   [
+                                       "help", "max=", "uppercase", "lowercase",
+                                       "whitespace", "numbers", "specialchars", "hash="
+                                   ])
+    except getopt.GetoptError:
+        print_help()
+        sys.exit(2)
+
+    options = {
+        'MAXLENGTH': 8,
+        'UPPERCASE': False,
+        'LOWERCASE': False,
+        'SPACE': False,
+        'NUMBERS': False,
+        'SPECIALCHARS': False
+    }
+
+    sha_hash = ''
+
+    for opt, arg in opts:
+        if opt == "--help":
+            print_help()
+            sys.exit()
+        elif opt in ("-m", "--max"):
+            options['MAXLENGTH'] = int(arg)
+        elif opt in ("-u", "--uppercase"):
+            options['UPPERCASE'] = True
+        elif opt in ("-l", "--lowercase"):
+            options['LOWERCASE'] = True
+        elif opt in ("-w", "--whitespace"):
+            options['SPACE'] = True
+        elif opt in ("-n", "--numbers"):
+            options['NUMBERS'] = True
+        elif opt in ("-s", "--specialchars"):
+            options['SPECIALCHARS'] = True
+        elif opt in ("-h", "--hash"):
+            sha_hash = arg
+
+    if not sha_hash == '':
+
+        machine = Decryptor(sha_hash, options)
+
+        machine.decrypt()
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
+

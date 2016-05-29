@@ -75,7 +75,8 @@ def print_help():
           "-l/--lowercase: enables lowercase letters\n" +
           "-w/--whitespace: enables whitespace\n" +
           "-n/--lowercase: enables numbers\n" +
-          "-s/--specialchars: enables special characters\n")
+          "-s/--specialchars: enables special characters\n" +
+          "-h/--hash SHA1HASH: password to decrypt\n")
 
 
 def main(argv):
